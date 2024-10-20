@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 
 const IncomeScreen: React.FC = () => {
   // Durumlar (state)
@@ -16,12 +16,36 @@ const IncomeScreen: React.FC = () => {
     setSelectedCurrency(currency);
   };
 
+  // Kaydetme fonksiyonları
+  const handleSaveDollar = () => {
+    if (dollarRate && dollarAmount) {
+      Alert.alert('Dolar Kaydedildi', `Dolar Alış Kuru: ${dollarRate}, Miktar: ${dollarAmount}`);
+    } else {
+      Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
+    }
+  };
+
+  const handleSaveEuro = () => {
+    if (euroRate && euroAmount) {
+      Alert.alert('Euro Kaydedildi', `Euro Alış Kuru: ${euroRate}, Miktar: ${euroAmount}`);
+    } else {
+      Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
+    }
+  };
+
+  const handleSaveGold = () => {
+    if (goldRate && goldAmount) {
+      Alert.alert('Altın Kaydedildi', `Altın Alış Kuru: ${goldRate}, Miktar: ${goldAmount}`);
+    } else {
+      Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Yatırım Ekranı</Text>
-      
+
       <View style={styles.currencyBoxContainer}>
-        
         <TouchableOpacity
           style={styles.currencyBox}
           onPress={() => handleCurrencyPress('dollar')}
@@ -29,7 +53,6 @@ const IncomeScreen: React.FC = () => {
           <Text style={styles.currencyText}>Dolar</Text>
         </TouchableOpacity>
 
-        
         <TouchableOpacity
           style={styles.currencyBox}
           onPress={() => handleCurrencyPress('euro')}
@@ -37,7 +60,6 @@ const IncomeScreen: React.FC = () => {
           <Text style={styles.currencyText}>Euro</Text>
         </TouchableOpacity>
 
-        
         <TouchableOpacity
           style={styles.currencyBox}
           onPress={() => handleCurrencyPress('gold')}
@@ -65,6 +87,9 @@ const IncomeScreen: React.FC = () => {
             value={dollarAmount}
             onChangeText={setDollarAmount}
           />
+          <TouchableOpacity style={styles.saveButton} onPress={handleSaveDollar}>
+            <Text style={styles.saveButtonText}>Kaydet</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -86,6 +111,9 @@ const IncomeScreen: React.FC = () => {
             value={euroAmount}
             onChangeText={setEuroAmount}
           />
+          <TouchableOpacity style={styles.saveButton} onPress={handleSaveEuro}>
+            <Text style={styles.saveButtonText}>Kaydet</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -107,6 +135,9 @@ const IncomeScreen: React.FC = () => {
             value={goldAmount}
             onChangeText={setGoldAmount}
           />
+          <TouchableOpacity style={styles.saveButton} onPress={handleSaveGold}>
+            <Text style={styles.saveButtonText}>Kaydet</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -158,6 +189,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 16,
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

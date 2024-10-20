@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, Platform, ScrollView, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+
 
 const ExpensesScreen: React.FC = () => {
   // Gelirler için state
@@ -30,7 +31,7 @@ const ExpensesScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {/* Gelirler Bölümü */}
       <Text style={styles.title}>Gelirler</Text>
 
@@ -39,6 +40,7 @@ const ExpensesScreen: React.FC = () => {
         selectedValue={selectedIncomeCategory}
         onValueChange={(itemValue) => setSelectedIncomeCategory(itemValue)}
         style={styles.picker}
+        mode={Platform.OS === 'ios' ? 'dialog' : 'dropdown'}  // iOS'ta dialog, Android'de dropdown
       >
         <Picker.Item label="Bir kategori seçiniz" value="" />
         <Picker.Item label="Maaş" value="Maaş" />
@@ -55,8 +57,9 @@ const ExpensesScreen: React.FC = () => {
         value={incomeAmount}
         onChangeText={setIncomeAmount}
       />
-
-      <Button title="Gelir Kaydet" onPress={handleSaveIncome} />
+      <TouchableOpacity style={styles.customButton} onPress={handleSaveIncome}>
+        <Text style={styles.buttonText}>Gelir Kaydet</Text>
+      </TouchableOpacity>
 
       {/* Harcamalar Bölümü */}
       <Text style={styles.title}>Harcamalar</Text>
@@ -66,6 +69,7 @@ const ExpensesScreen: React.FC = () => {
         selectedValue={selectedExpenseCategory}
         onValueChange={(itemValue) => setSelectedExpenseCategory(itemValue)}
         style={styles.picker}
+        mode={Platform.OS === 'ios' ? 'dialog' : 'dropdown'}  // iOS'ta dialog, Android'de dropdown
       >
         <Picker.Item label="Bir kategori seçiniz" value="" />
         <Picker.Item label="Market" value="Market" />
@@ -85,8 +89,10 @@ const ExpensesScreen: React.FC = () => {
         onChangeText={setExpenseAmount}
       />
 
-      <Button title="Harcama Kaydet" onPress={handleSaveExpense} />
-    </View>
+<TouchableOpacity style={styles.customButton} onPress={handleSaveExpense}>
+        <Text style={styles.buttonText}>Harcama Kaydet</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
@@ -105,11 +111,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 16,
     padding: 5,
+    paddingTop: 30,
   },
   picker: {
     height: 50,
     width: '100%',
     marginBottom: 16,
+    
   },
   input: {
     padding: 5,
@@ -119,6 +127,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginBottom: 16,
     borderRadius: 10,
+  },
+  customButton: {
+    backgroundColor: '#4CAF50',  // Butonun arka plan rengi
+    padding: 15,                // İç boşluk
+    borderRadius: 10,           // Köşelerin yuvarlatılması
+    alignItems: 'center',       // Yazının ortalanması
+    marginTop: 10,              // Üst boşluk
+    marginBottom: 30,
+  },
+  buttonText: {
+    color: '#fff',             // Yazı rengi
+    fontSize: 18,              // Yazı boyutu
+    fontWeight: 'bold',        // Yazı kalınlığı
   },
 });
 
