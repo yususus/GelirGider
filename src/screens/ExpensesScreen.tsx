@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Platform, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, Platform, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
-
 const ExpensesScreen: React.FC = () => {
-  // Gelirler için state
   const [selectedIncomeCategory, setSelectedIncomeCategory] = useState<string>('');
   const [incomeAmount, setIncomeAmount] = useState<string>('');
-
-  // Harcamalar için state
   const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<string>('');
   const [expenseAmount, setExpenseAmount] = useState<string>('');
+  const [isIncomePickerVisible, setIncomePickerVisible] = useState(false);
+  const [isExpensePickerVisible, setExpensePickerVisible] = useState(false);
+
+  const incomeCategories = ["Maaş", "Kira", "Yatırım", "Diğer"];
+  const expenseCategories = ["Market", "Ulaşım", "Alışveriş", "Kırtasiye / Okul", "Çevrimiçi Harcamalar", "Faturalar"];
 
   const handleSaveIncome = () => {
     if (selectedIncomeCategory && incomeAmount) {
       Alert.alert('Gelir Kaydedildi', `${selectedIncomeCategory}, Tutar: ${incomeAmount}`);
-      // Kaydedilen gelir verilerini işlemek için
     } else {
       Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
     }
@@ -24,7 +24,6 @@ const ExpensesScreen: React.FC = () => {
   const handleSaveExpense = () => {
     if (selectedExpenseCategory && expenseAmount) {
       Alert.alert('Harcama Kaydedildi', `${selectedExpenseCategory}, Tutar: ${expenseAmount}`);
-      // Kaydedilen harcama verilerini işlemek için
     } else {
       Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
     }
@@ -32,22 +31,32 @@ const ExpensesScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Gelirler Bölümü */}
       <Text style={styles.title}>Gelirler</Text>
 
       <Text style={styles.label}>Kategoriler:</Text>
-      <Picker
-        selectedValue={selectedIncomeCategory}
-        onValueChange={(itemValue) => setSelectedIncomeCategory(itemValue)}
-        style={styles.picker}
-        mode={Platform.OS === 'ios' ? 'dialog' : 'dropdown'}  // iOS'ta dialog, Android'de dropdown
-      >
-        <Picker.Item label="Bir kategori seçiniz" value="" />
-        <Picker.Item label="Maaş" value="Maaş" />
-        <Picker.Item label="Kira" value="Kira" />
-        <Picker.Item label="Yatırım" value="Yatırım" />
-        <Picker.Item label="Diğer" value="Diğer" />
-      </Picker>
+      <TouchableOpacity onPress={() => setIncomePickerVisible(true)} style={styles.pickerButton}>
+        <Text style={styles.buttonText}>{selectedIncomeCategory || "Bir kategori seçiniz"}</Text>
+      </TouchableOpacity>
+
+      <Modal visible={isIncomePickerVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Gelir Kategorisi Seçin</Text>
+            {incomeCategories.map((category, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setSelectedIncomeCategory(category);
+                  setIncomePickerVisible(false);
+                }}
+              >
+                <Text style={styles.categoryText}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+            <Button title="Kapat" onPress={() => setIncomePickerVisible(false)} />
+          </View>
+        </View>
+      </Modal>
 
       <Text style={styles.label}>Tutar:</Text>
       <TextInput
@@ -61,24 +70,32 @@ const ExpensesScreen: React.FC = () => {
         <Text style={styles.buttonText}>Gelir Kaydet</Text>
       </TouchableOpacity>
 
-      {/* Harcamalar Bölümü */}
       <Text style={styles.title}>Harcamalar</Text>
 
       <Text style={styles.label}>Kategoriler:</Text>
-      <Picker
-        selectedValue={selectedExpenseCategory}
-        onValueChange={(itemValue) => setSelectedExpenseCategory(itemValue)}
-        style={styles.picker}
-        mode={Platform.OS === 'ios' ? 'dialog' : 'dropdown'}  // iOS'ta dialog, Android'de dropdown
-      >
-        <Picker.Item label="Bir kategori seçiniz" value="" />
-        <Picker.Item label="Market" value="Market" />
-        <Picker.Item label="Ulaşım" value="Ulaşım" />
-        <Picker.Item label="Alışveriş" value="Alışveriş" />
-        <Picker.Item label="Kırtasiye / Okul" value="Kırtasiye / Okul" />
-        <Picker.Item label="Çevrimiçi Harcamalar" value="Çevrimiçi Harcamalar" />
-        <Picker.Item label="Faturalar" value="Faturalar" />
-      </Picker>
+      <TouchableOpacity onPress={() => setExpensePickerVisible(true)} style={styles.pickerButton}>
+        <Text style={styles.buttonText}>{selectedExpenseCategory || "Bir kategori seçiniz"}</Text>
+      </TouchableOpacity>
+
+      <Modal visible={isExpensePickerVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Harcama Kategorisi Seçin</Text>
+            {expenseCategories.map((category, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setSelectedExpenseCategory(category);
+                  setExpensePickerVisible(false);
+                }}
+              >
+                <Text style={styles.categoryText}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+            <Button title="Kapat" onPress={() => setExpensePickerVisible(false)} />
+          </View>
+        </View>
+      </Modal>
 
       <Text style={styles.label}>Tutar:</Text>
       <TextInput
@@ -88,8 +105,7 @@ const ExpensesScreen: React.FC = () => {
         value={expenseAmount}
         onChangeText={setExpenseAmount}
       />
-
-<TouchableOpacity style={styles.customButton} onPress={handleSaveExpense}>
+      <TouchableOpacity style={styles.customButton} onPress={handleSaveExpense}>
         <Text style={styles.buttonText}>Harcama Kaydet</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -97,50 +113,17 @@ const ExpensesScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#0d2137',
-  },
-  label: {
-    fontSize: 18,
-    marginTop: 16,
-    padding: 5,
-    paddingTop: 30,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    marginBottom: 16,
-    
-  },
-  input: {
-    padding: 5,
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-    borderRadius: 10,
-  },
-  customButton: {
-    backgroundColor: '#4CAF50',  // Butonun arka plan rengi
-    padding: 15,                // İç boşluk
-    borderRadius: 10,           // Köşelerin yuvarlatılması
-    alignItems: 'center',       // Yazının ortalanması
-    marginTop: 10,              // Üst boşluk
-    marginBottom: 30,
-  },
-  buttonText: {
-    color: '#fff',             // Yazı rengi
-    fontSize: 18,              // Yazı boyutu
-    fontWeight: 'bold',        // Yazı kalınlığı
-  },
+  container: { flex: 1, padding: 16 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, color: '#0d2137' },
+  label: { fontSize: 18, marginTop: 16, padding: 5 },
+  input: { padding: 5, height: 50, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 8, marginBottom: 16, borderRadius: 10 },
+  customButton: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10, marginBottom: 30 },
+  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  pickerButton: { backgroundColor: '#ccc', padding: 15, borderRadius: 10, marginBottom: 16, alignItems: 'center' },
+  modalContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+  modalContent: { backgroundColor: 'white', marginHorizontal: 20, padding: 20, borderRadius: 10 },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+  categoryText: { fontSize: 18, paddingVertical: 8, textAlign: 'center' },
 });
 
 export default ExpensesScreen;
