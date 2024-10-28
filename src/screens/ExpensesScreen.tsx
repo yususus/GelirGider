@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, Platform, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+
+import { useDispatch } from 'react-redux';
+import { addExpense, addIncome } from '../store/expensesSlice';
 
 const ExpensesScreen: React.FC = () => {
   const [selectedIncomeCategory, setSelectedIncomeCategory] = useState<string>('');
@@ -13,8 +15,11 @@ const ExpensesScreen: React.FC = () => {
   const incomeCategories = ["Maaş", "Kira", "Yatırım", "Diğer"];
   const expenseCategories = ["Market", "Ulaşım", "Alışveriş", "Kırtasiye / Okul", "Çevrimiçi Harcamalar", "Faturalar"];
 
+  const dispatch = useDispatch(); //redux ile veri kaydetme için
+
   const handleSaveIncome = () => {
     if (selectedIncomeCategory && incomeAmount) {
+      dispatch(addIncome({ category: selectedIncomeCategory, amount: incomeAmount}));
       Alert.alert('Gelir Kaydedildi', `${selectedIncomeCategory}, Tutar: ${incomeAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
@@ -23,6 +28,7 @@ const ExpensesScreen: React.FC = () => {
 
   const handleSaveExpense = () => {
     if (selectedExpenseCategory && expenseAmount) {
+      dispatch(addExpense({ category: selectedExpenseCategory, amount: expenseAmount }));
       Alert.alert('Harcama Kaydedildi', `${selectedExpenseCategory}, Tutar: ${expenseAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
@@ -38,7 +44,7 @@ const ExpensesScreen: React.FC = () => {
         <Text style={styles.buttonText}>{selectedIncomeCategory || "Bir kategori seçiniz"}</Text>
       </TouchableOpacity>
 
-      <Modal visible={isIncomePickerVisible} transparent={true} animationType="slide">
+      <Modal visible={isIncomePickerVisible} transparent={true} animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Gelir Kategorisi Seçin</Text>

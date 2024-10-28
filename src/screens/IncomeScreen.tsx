@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { addInvestment } from '../store/investmentSlice';
 
 const IncomeScreen: React.FC = () => {
   // Durumlar (state)
@@ -11,6 +13,8 @@ const IncomeScreen: React.FC = () => {
   const [goldRate, setGoldRate] = useState<string>('');
   const [goldAmount, setGoldAmount] = useState<string>('');
 
+  const dispatch = useDispatch();
+  
   // Para birimi kutusuna tıklama fonksiyonu
   const handleCurrencyPress = (currency: string) => {
     setSelectedCurrency(currency);
@@ -19,6 +23,7 @@ const IncomeScreen: React.FC = () => {
   // Kaydetme fonksiyonları
   const handleSaveDollar = () => {
     if (dollarRate && dollarAmount) {
+      dispatch(addInvestment({currency: 'Dolar' ,rate: dollarRate, amount: dollarAmount}));
       Alert.alert('Dolar Kaydedildi', `Dolar Alış Kuru: ${dollarRate}, Miktar: ${dollarAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
@@ -27,6 +32,7 @@ const IncomeScreen: React.FC = () => {
 
   const handleSaveEuro = () => {
     if (euroRate && euroAmount) {
+      dispatch(addInvestment({ currency: 'Euro', rate: 'Euro', amount: euroAmount }));
       Alert.alert('Euro Kaydedildi', `Euro Alış Kuru: ${euroRate}, Miktar: ${euroAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
@@ -35,6 +41,7 @@ const IncomeScreen: React.FC = () => {
 
   const handleSaveGold = () => {
     if (goldRate && goldAmount) {
+      dispatch(addInvestment({currency: 'Gold' ,rate: 'Gold', amount: goldAmount}));
       Alert.alert('Altın Kaydedildi', `Altın Alış Kuru: ${goldRate}, Miktar: ${goldAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
