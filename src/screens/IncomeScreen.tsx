@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { addInvestment } from '../store/investmentSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 const IncomeScreen: React.FC = () => {
   // Durumlar (state)
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
-  const [dollarRate, setDollarRate] = useState<string>('');
-  const [dollarAmount, setDollarAmount] = useState<string>('');
+  const [dollarRate, setDollarRate] = useState('');
+  const [dollarAmount, setDollarAmount] = useState('');
   const [euroRate, setEuroRate] = useState<string>('');
   const [euroAmount, setEuroAmount] = useState<string>('');
   const [goldRate, setGoldRate] = useState<string>('');
   const [goldAmount, setGoldAmount] = useState<string>('');
 
-  const dispatch = useDispatch();
   
   // Para birimi kutusuna tıklama fonksiyonu
   const handleCurrencyPress = (currency: string) => {
@@ -21,9 +21,10 @@ const IncomeScreen: React.FC = () => {
   };
 
   // Kaydetme fonksiyonları
-  const handleSaveDollar = () => {
+  const handleSaveDollar = async () => {
     if (dollarRate && dollarAmount) {
-      dispatch(addInvestment({currency: 'Dolar' ,rate: dollarRate, amount: dollarAmount}));
+      const incomeData = { dollarRate, dollarAmount };
+      await AsyncStorage.setItem('incomeData', JSON.stringify(incomeData));
       Alert.alert('Dolar Kaydedildi', `Dolar Alış Kuru: ${dollarRate}, Miktar: ${dollarAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
@@ -32,7 +33,6 @@ const IncomeScreen: React.FC = () => {
 
   const handleSaveEuro = () => {
     if (euroRate && euroAmount) {
-      dispatch(addInvestment({ currency: 'Euro', rate: 'Euro', amount: euroAmount }));
       Alert.alert('Euro Kaydedildi', `Euro Alış Kuru: ${euroRate}, Miktar: ${euroAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
@@ -41,7 +41,6 @@ const IncomeScreen: React.FC = () => {
 
   const handleSaveGold = () => {
     if (goldRate && goldAmount) {
-      dispatch(addInvestment({currency: 'Gold' ,rate: 'Gold', amount: goldAmount}));
       Alert.alert('Altın Kaydedildi', `Altın Alış Kuru: ${goldRate}, Miktar: ${goldAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');

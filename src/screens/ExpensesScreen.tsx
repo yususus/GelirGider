@@ -1,37 +1,47 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, Platform, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { useDispatch } from 'react-redux';
-import { addExpense, addIncome } from '../store/expensesSlice';
+
 
 const ExpensesScreen: React.FC = () => {
   const [selectedIncomeCategory, setSelectedIncomeCategory] = useState<string>('');
   const [incomeAmount, setIncomeAmount] = useState<string>('');
-  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<string>('');
   const [expenseAmount, setExpenseAmount] = useState<string>('');
+  const [expenseCategory, setExpenseCategory] = useState('');
   const [isIncomePickerVisible, setIncomePickerVisible] = useState(false);
   const [isExpensePickerVisible, setExpensePickerVisible] = useState(false);
 
   const incomeCategories = ["Maaş", "Kira", "Yatırım", "Diğer"];
   const expenseCategories = ["Market", "Ulaşım", "Alışveriş", "Kırtasiye / Okul", "Çevrimiçi Harcamalar", "Faturalar"];
 
-  const dispatch = useDispatch(); //redux ile veri kaydetme için
 
   const handleSaveIncome = () => {
     if (selectedIncomeCategory && incomeAmount) {
-      dispatch(addIncome({ category: selectedIncomeCategory, amount: incomeAmount}));
+      
       Alert.alert('Gelir Kaydedildi', `${selectedIncomeCategory}, Tutar: ${incomeAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
     }
   };
-
+/* eski hali
   const handleSaveExpense = () => {
     if (selectedExpenseCategory && expenseAmount) {
-      dispatch(addExpense({ category: selectedExpenseCategory, amount: expenseAmount }));
+      
       Alert.alert('Harcama Kaydedildi', `${selectedExpenseCategory}, Tutar: ${expenseAmount}`);
     } else {
       Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
+    }
+  };
+  */
+
+  const handleSaveExpense = async () => {
+    if (expenseCategory && expenseAmount) {
+      const expenseData = { expenseCategory, expenseAmount };
+      await AsyncStorage.setItem('expenseData', JSON.stringify(expenseData));
+      Alert.alert('Harcama Kaydedildi', `Kategori: ${expenseCategory}, Tutar: ${expenseAmount}`);
+    } else {
+      Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
     }
   };
 
@@ -80,7 +90,7 @@ const ExpensesScreen: React.FC = () => {
 
       <Text style={styles.label}>Kategoriler:</Text>
       <TouchableOpacity onPress={() => setExpensePickerVisible(true)} style={styles.pickerButton}>
-        <Text style={styles.buttonText}>{selectedExpenseCategory || "Bir kategori seçiniz"}</Text>
+        <Text style={styles.buttonText}>{expenseCategory || "Bir kategori seçiniz"}</Text>
       </TouchableOpacity>
 
       <Modal visible={isExpensePickerVisible} transparent={true} animationType="slide">
@@ -91,7 +101,7 @@ const ExpensesScreen: React.FC = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => {
-                  setSelectedExpenseCategory(category);
+                  setExpenseCategory(category);
                   setExpensePickerVisible(false);
                 }}
               >
