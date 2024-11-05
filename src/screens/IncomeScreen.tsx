@@ -9,11 +9,29 @@ const IncomeScreen: React.FC = () => {
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const [dollarRate, setDollarRate] = useState('');
   const [dollarAmount, setDollarAmount] = useState('');
-  const [euroRate, setEuroRate] = useState<string>('');
-  const [euroAmount, setEuroAmount] = useState<string>('');
-  const [goldRate, setGoldRate] = useState<string>('');
-  const [goldAmount, setGoldAmount] = useState<string>('');
+  const [euroRate, setEuroRate] = useState('');
+  const [euroAmount, setEuroAmount] = useState('');
+  const [goldRate, setGoldRate] = useState('');
+  const [goldAmount, setGoldAmount] = useState('');
 
+
+  interface Transaction {
+    rate: number;
+    amount: number;
+    date: string;
+  }
+  
+  interface CurrencyData {
+    transactions: Transaction[];
+    totalAmount: number;
+    averageRate: number;
+  }
+  
+  interface InvestmentData {
+    dollar?: CurrencyData;
+    euro?: CurrencyData;
+    gold?: CurrencyData;
+  }
   
   // Para birimi kutusuna tıklama fonksiyonu
   const handleCurrencyPress = (currency: string) => {
@@ -23,25 +41,150 @@ const IncomeScreen: React.FC = () => {
   // Kaydetme fonksiyonları
   const handleSaveDollar = async () => {
     if (dollarRate && dollarAmount) {
-      const incomeData = { dollarRate, dollarAmount };
-      await AsyncStorage.setItem('incomeData', JSON.stringify(incomeData));
-      Alert.alert('Dolar Kaydedildi', `Dolar Alış Kuru: ${dollarRate}, Miktar: ${dollarAmount}`);
+      try{
+        const currentData = await AsyncStorage.getItem('incomeData');
+        const parsedData = currentData ? JSON.parse(currentData) : {};
+
+        const newTransaction: Transaction = {
+          rate: parseFloat(dollarRate),
+          amount: parseFloat(dollarAmount),
+          date : new Date().toISOString()
+        };
+
+        const currentDollarData = parsedData.dollar || {transactions: [], totalAmount: 0, averageRate: 0 };
+
+        const updatedTransactions = [...currentDollarData.transactions, newTransaction];
+
+        const totalAmount = updatedTransactions.reduce((sum, t) => sum + t.amount, 0);
+        const weightedSum = updatedTransactions.reduce((sum, t) => sum + (t.rate * t.amount), 0);
+        const averageRate = weightedSum / totalAmount;
+
+        const updatedDolarData: CurrencyData = {
+          transactions: updatedTransactions,
+          totalAmount,
+          averageRate
+        };
+
+        const newData: InvestmentData = {
+          ...parsedData,
+          dollar: updatedDolarData
+        };
+
+        await AsyncStorage.setItem('incomeData', JSON.stringify(newData));
+        Alert.alert('Dolar Kaydedildi',
+          `İşlem Kuru: ${dollarRate}\n` +
+          `İşlem Miktarı: ${dollarAmount}\n` +
+          `Toplam Miktar: ${totalAmount}\n` +
+          `Ortalama Maliyet: ${averageRate.toFixed(2)}`
+        )
+
+
+
+      } 
+      catch (error) {
+        console.error('Kayıt hatası:', error);
+        Alert.alert('Hata', 'Veriler kaydedilirken bir hata oluştu');
+      }
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
     }
   };
-
-  const handleSaveEuro = () => {
+  
+  const handleSaveEuro = async () => {
     if (euroRate && euroAmount) {
-      Alert.alert('Euro Kaydedildi', `Euro Alış Kuru: ${euroRate}, Miktar: ${euroAmount}`);
+      try {
+        // Mevcut verileri al
+        const currentData = await AsyncStorage.getItem('incomeData');
+        const parsedData: InvestmentData = currentData ? JSON.parse(currentData) : {};
+        
+        const newTransaction: Transaction = {
+          rate: parseFloat(euroRate),
+          amount: parseFloat(euroAmount),
+          date: new Date().toISOString()
+        };
+  
+        // Euro verilerini güncelle
+        const currentEuroData = parsedData.euro || { transactions: [], totalAmount: 0, averageRate: 0 };
+        
+        // Yeni işlemi ekle
+        const updatedTransactions = [...currentEuroData.transactions, newTransaction];
+        
+        // Toplam miktar ve ortalama kur hesapla
+        const totalAmount = updatedTransactions.reduce((sum, t) => sum + t.amount, 0);
+        const weightedSum = updatedTransactions.reduce((sum, t) => sum + (t.rate * t.amount), 0);
+        const averageRate = weightedSum / totalAmount;
+  
+        const updatedEuroData: CurrencyData = {
+          transactions: updatedTransactions,
+          totalAmount,
+          averageRate
+        };
+  
+        // Tüm verileri güncelle
+        const newData: InvestmentData = {
+          ...parsedData,
+          euro: updatedEuroData
+        };
+  
+        await AsyncStorage.setItem('incomeData', JSON.stringify(newData));
+        Alert.alert('Euro Kaydedildi', 
+          `İşlem Kuru: ${euroRate}\n` +
+          `İşlem Miktarı: ${euroAmount}\n` +
+          `Toplam Miktar: ${totalAmount}\n` +
+          `Ortalama Maliyet: ${averageRate.toFixed(2)}`
+        );
+      } catch (error) {
+        console.error('Kayıt hatası:', error);
+        Alert.alert('Hata', 'Veriler kaydedilirken bir hata oluştu');
+      }
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
     }
   };
-
-  const handleSaveGold = () => {
+  
+  const handleSaveGold = async () => {
     if (goldRate && goldAmount) {
-      Alert.alert('Altın Kaydedildi', `Altın Alış Kuru: ${goldRate}, Miktar: ${goldAmount}`);
+      try {
+        const currentData = await AsyncStorage.getItem('incomeData');
+        const parsedData = currentData ? JSON.parse(currentData) : {};
+
+        const newTransaction: Transaction = {
+          rate: parseFloat(goldRate),
+          amount: parseFloat(goldAmount),
+          date: new Date().toISOString()
+        };
+
+        const currentGoldData = parsedData.gold || { transactions: [], totalAmount: 0, averageRate: 0};
+
+        const updatedTransactions = [...currentGoldData.transactions, newTransaction];
+
+        const totalAmount = updatedTransactions.reduce((sum, t) => sum + t.amount, 0);
+        const weightedSum = updatedTransactions.reduce((sum,t) => sum + (t.rate * t.amount), 0);
+        const averageRate = weightedSum / totalAmount;
+
+        const updatedGoldData: CurrencyData = {
+          transactions: updatedTransactions,
+          totalAmount,
+          averageRate
+        };
+
+        const newData: InvestmentData = {
+          ...parsedData,
+          gold: updatedGoldData
+        };
+
+        await AsyncStorage.setItem('incomeData', JSON.stringify(newData));
+        Alert.alert('Altın Kaydedildi',
+          `İşlem Kuru: ${goldRate}\n` +
+          `İşlem Miktarı: ${goldAmount}\n` +
+          `Toplam Miktar: ${totalAmount}\n` +
+          `Ortalama Maliyet: ${averageRate.toFixed(2)}`
+        );
+      }
+      catch (error){
+        console.error('Kayıt hatası: ', error);
+        Alert.alert('Hata', 'Veriler kaydedilirken bir hata oluştur');
+      } 
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
     }

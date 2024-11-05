@@ -1,11 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface GroupBoxProps {
   title: string;
   children: React.ReactNode;
   style?: ViewStyle;
+}
+
+// Yatırım verisi için interface
+interface Transaction {
+  rate: number;
+  amount: number;
+  date: string;
+}
+
+interface CurrencyData {
+  transactions: Transaction[];
+  totalAmount: number;
+  averageRate: number;
+}
+
+interface InvestmentData {
+  dollar?: CurrencyData;
+  euro?: CurrencyData;
+  gold?: CurrencyData;
 }
 
 const GroupBox: React.FC<GroupBoxProps> = ({ title, children, style }) => {
@@ -24,34 +43,148 @@ const GroupBox: React.FC<GroupBoxProps> = ({ title, children, style }) => {
 };
 
 const HomeScreen: React.FC = () => {
-  const [incomeData, setIncomeData] = useState<{ dollarRate: string; dollarAmount: string } | null>(null);
+  const [investmentData, setInvestmentData] = useState<InvestmentData | null>(null);
   const [expenseData, setExpenseData] = useState<{ expenseCategory: string; expenseAmount: string } | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      const income = await AsyncStorage.getItem('incomeData');
-      const expense = await AsyncStorage.getItem('expenseData');
-      if (income) setIncomeData(JSON.parse(income));
-      if (expense) setExpenseData(JSON.parse(expense));
+      try {
+        const income = await AsyncStorage.getItem('incomeData');
+        const expense = await AsyncStorage.getItem('expenseData');
+        
+        if (income) {
+          const parsedIncome = JSON.parse(income);
+          setInvestmentData(parsedIncome);
+        }
+        
+        if (expense) {
+          const parsedExpense = JSON.parse(expense);
+          setExpenseData(parsedExpense);
+        }
+      } catch (error) {
+        console.error('Veri yükleme hatası:', error);
+      }
     };
+
     loadData();
   }, []);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.mainTitle}>Özet</Text>
       
-      {/* Gelir Bilgileri */}
-      {incomeData && (
-        <GroupBox title="Döviz Bilgileri">
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Dolar Alış Kuru:</Text>
-            <Text style={styles.value}>{incomeData.dollarRate} ₺</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Miktar:</Text>
-            <Text style={styles.value}>{incomeData.dollarAmount} $</Text>
-          </View>
+      {/* Yatırım Bilgileri */}
+      {investmentData && (
+        <GroupBox title="Döviz ve Altın Bilgileri">
+          {/* dolar Bilgileri */}
+          {investmentData.dollar && (
+            <>
+              <View style={styles.currencyHeader}>
+                <Text style={styles.currencyTitle}>Dolar Portföyü</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Toplam Miktar:</Text>
+                <Text style={styles.value}>{investmentData.dollar.totalAmount.toFixed(2)} €</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Ortalama Maliyet:</Text>
+                <Text style={styles.value}>{investmentData.dollar.averageRate.toFixed(2)} ₺</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Toplam Maliyet:</Text>
+                <Text style={styles.value}>
+                  {(investmentData.dollar.totalAmount * investmentData.dollar.averageRate).toFixed(2)} ₺
+                </Text>
+              </View>
+              
+              {/* Son İşlemler */}
+              <View style={styles.transactionsContainer}>
+                <Text style={styles.sectionTitle}>Son İşlemler</Text>
+                {investmentData.dollar.transactions.slice(-3).reverse().map((transaction, index) => (
+                  <View key={index} style={styles.transactionRow}>
+                    <Text style={styles.transactionDate}>
+                      {new Date(transaction.date).toLocaleDateString('tr-TR')}
+                    </Text>
+                    <Text style={styles.transactionAmount}>{transaction.amount} $</Text>
+                    <Text style={styles.transactionRate}>{transaction.rate} ₺</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+          
+          {/* Euro Bilgileri */}
+          {investmentData.euro && (
+            <>
+              <View style={styles.currencyHeader}>
+                <Text style={styles.currencyTitle}>Euro Portföyü</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Toplam Miktar:</Text>
+                <Text style={styles.value}>{investmentData.euro.totalAmount.toFixed(2)} €</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Ortalama Maliyet:</Text>
+                <Text style={styles.value}>{investmentData.euro.averageRate.toFixed(2)} ₺</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Toplam Maliyet:</Text>
+                <Text style={styles.value}>
+                  {(investmentData.euro.totalAmount * investmentData.euro.averageRate).toFixed(2)} ₺
+                </Text>
+              </View>
+              
+              {/* Son İşlemler */}
+              <View style={styles.transactionsContainer}>
+                <Text style={styles.sectionTitle}>Son İşlemler</Text>
+                {investmentData.euro.transactions.slice(-3).reverse().map((transaction, index) => (
+                  <View key={index} style={styles.transactionRow}>
+                    <Text style={styles.transactionDate}>
+                      {new Date(transaction.date).toLocaleDateString('tr-TR')}
+                    </Text>
+                    <Text style={styles.transactionAmount}>{transaction.amount} €</Text>
+                    <Text style={styles.transactionRate}>{transaction.rate} ₺</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+          {/* altın Bilgileri */}
+          {investmentData.gold && (
+            <>
+              <View style={styles.currencyHeader}>
+                <Text style={styles.currencyTitle}>Altın Portföyü</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Toplam Miktar:</Text>
+                <Text style={styles.value}>{investmentData.gold.totalAmount.toFixed(2)} €</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Ortalama Maliyet:</Text>
+                <Text style={styles.value}>{investmentData.gold.averageRate.toFixed(2)} ₺</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Toplam Maliyet:</Text>
+                <Text style={styles.value}>
+                  {(investmentData.gold.totalAmount * investmentData.gold.averageRate).toFixed(2)} ₺
+                </Text>
+              </View>
+              
+              {/* Son İşlemler */}
+              <View style={styles.transactionsContainer}>
+                <Text style={styles.sectionTitle}>Son İşlemler</Text>
+                {investmentData.gold.transactions.slice(-3).reverse().map((transaction, index) => (
+                  <View key={index} style={styles.transactionRow}>
+                    <Text style={styles.transactionDate}>
+                      {new Date(transaction.date).toLocaleDateString('tr-TR')}
+                    </Text>
+                    <Text style={styles.transactionAmount}>{transaction.amount} €</Text>
+                    <Text style={styles.transactionRate}>{transaction.rate} ₺</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
         </GroupBox>
       )}
       
@@ -68,7 +201,7 @@ const HomeScreen: React.FC = () => {
           </View>
         </GroupBox>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -128,6 +261,49 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333333',
     fontWeight: '600',
+  },
+  currencyHeader: {
+    paddingTop: 15,
+    marginBottom: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: '#E0E0E0',
+    paddingBottom: 5,
+  },
+  currencyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  transactionsContainer: {
+    marginTop: 15,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#666',
+    marginBottom: 8,
+  },
+  transactionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  transactionDate: {
+    fontSize: 12,
+    color: '#666',
+  },
+  transactionAmount: {
+    fontSize: 12,
+    color: '#333',
+    fontWeight: '500',
+  },
+  transactionRate: {
+    fontSize: 12,
+    color: '#333',
+    fontWeight: '500',
   },
 });
 
