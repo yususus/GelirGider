@@ -45,21 +45,28 @@ const GroupBox: React.FC<GroupBoxProps> = ({ title, children, style }) => {
 const HomeScreen: React.FC = () => {
   const [investmentData, setInvestmentData] = useState<InvestmentData | null>(null);
   const [expenseData, setExpenseData] = useState<{ expenseCategory: string; expenseAmount: string } | null>(null);
+  const [incomeData, setIncomeData] = useState<{ incomeCategory: string; incomeAmount: string } | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const income = await AsyncStorage.getItem('incomeData');
+        const invest = await AsyncStorage.getItem('investData');
         const expense = await AsyncStorage.getItem('expenseData');
+        const income = await AsyncStorage.getItem('incomeData')
         
-        if (income) {
-          const parsedIncome = JSON.parse(income);
-          setInvestmentData(parsedIncome);
+        if (invest) {
+          const parsedInvest = JSON.parse(invest);
+          setInvestmentData(parsedInvest);
         }
         
         if (expense) {
           const parsedExpense = JSON.parse(expense);
           setExpenseData(parsedExpense);
+        }
+
+        if (income) {
+          const parsedIncome = JSON.parse(income);
+          setIncomeData(parsedIncome);
         }
       } catch (error) {
         console.error('Veri yükleme hatası:', error);
@@ -201,6 +208,20 @@ const HomeScreen: React.FC = () => {
           </View>
         </GroupBox>
       )}
+
+      {/* Gelir Bilgileri */}
+      {incomeData && (
+        <GroupBox title="Gelir Detayları">
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Kategori:</Text>
+            <Text style={styles.value}>{incomeData.incomeCategory}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Tutar:</Text>
+            <Text style={styles.value}>{incomeData.incomeAmount} ₺</Text>
+          </View>
+        </GroupBox>
+      )}
     </ScrollView>
   );
 };
@@ -220,6 +241,7 @@ const styles = StyleSheet.create({
   groupBox: {
     marginVertical: 10,
     marginHorizontal: 0,
+    marginBottom: 30,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E0E0E0',

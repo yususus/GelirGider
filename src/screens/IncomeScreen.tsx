@@ -42,7 +42,7 @@ const IncomeScreen: React.FC = () => {
   const handleSaveDollar = async () => {
     if (dollarRate && dollarAmount) {
       try{
-        const currentData = await AsyncStorage.getItem('incomeData');
+        const currentData = await AsyncStorage.getItem('investData');
         const parsedData = currentData ? JSON.parse(currentData) : {};
 
         const newTransaction: Transaction = {
@@ -70,7 +70,7 @@ const IncomeScreen: React.FC = () => {
           dollar: updatedDolarData
         };
 
-        await AsyncStorage.setItem('incomeData', JSON.stringify(newData));
+        await AsyncStorage.setItem('investData', JSON.stringify(newData));
         Alert.alert('Dolar Kaydedildi',
           `İşlem Kuru: ${dollarRate}\n` +
           `İşlem Miktarı: ${dollarAmount}\n` +
@@ -94,7 +94,7 @@ const IncomeScreen: React.FC = () => {
     if (euroRate && euroAmount) {
       try {
         // Mevcut verileri al
-        const currentData = await AsyncStorage.getItem('incomeData');
+        const currentData = await AsyncStorage.getItem('investData');
         const parsedData: InvestmentData = currentData ? JSON.parse(currentData) : {};
         
         const newTransaction: Transaction = {
@@ -126,7 +126,7 @@ const IncomeScreen: React.FC = () => {
           euro: updatedEuroData
         };
   
-        await AsyncStorage.setItem('incomeData', JSON.stringify(newData));
+        await AsyncStorage.setItem('investData', JSON.stringify(newData));
         Alert.alert('Euro Kaydedildi', 
           `İşlem Kuru: ${euroRate}\n` +
           `İşlem Miktarı: ${euroAmount}\n` +
@@ -145,7 +145,7 @@ const IncomeScreen: React.FC = () => {
   const handleSaveGold = async () => {
     if (goldRate && goldAmount) {
       try {
-        const currentData = await AsyncStorage.getItem('incomeData');
+        const currentData = await AsyncStorage.getItem('investData');
         const parsedData = currentData ? JSON.parse(currentData) : {};
 
         const newTransaction: Transaction = {
@@ -173,7 +173,7 @@ const IncomeScreen: React.FC = () => {
           gold: updatedGoldData
         };
 
-        await AsyncStorage.setItem('incomeData', JSON.stringify(newData));
+        await AsyncStorage.setItem('investData', JSON.stringify(newData));
         Alert.alert('Altın Kaydedildi',
           `İşlem Kuru: ${goldRate}\n` +
           `İşlem Miktarı: ${goldAmount}\n` +

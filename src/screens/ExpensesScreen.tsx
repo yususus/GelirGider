@@ -5,9 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const ExpensesScreen: React.FC = () => {
-  const [selectedIncomeCategory, setSelectedIncomeCategory] = useState<string>('');
-  const [incomeAmount, setIncomeAmount] = useState<string>('');
-  const [expenseAmount, setExpenseAmount] = useState<string>('');
+  const [incomeCategory, setIncomeCategory] = useState('');
+  const [incomeAmount, setIncomeAmount] = useState('');
+  const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('');
   const [isIncomePickerVisible, setIncomePickerVisible] = useState(false);
   const [isExpensePickerVisible, setExpensePickerVisible] = useState(false);
@@ -15,7 +15,7 @@ const ExpensesScreen: React.FC = () => {
   const incomeCategories = ["Maaş", "Kira", "Yatırım", "Diğer"];
   const expenseCategories = ["Market", "Ulaşım", "Alışveriş", "Kırtasiye / Okul", "Çevrimiçi Harcamalar", "Faturalar"];
 
-
+/*
   const handleSaveIncome = () => {
     if (selectedIncomeCategory && incomeAmount) {
       
@@ -24,6 +24,16 @@ const ExpensesScreen: React.FC = () => {
       Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
     }
   };
+  */
+  const handleSaveIncome = async () => {
+    if (incomeCategory && incomeAmount) {
+      const incomeData = { incomeCategory, incomeAmount };
+      await AsyncStorage.setItem('incomeData', JSON.stringify(incomeData));
+      Alert.alert('Gelir kaydedildi', `Kategori: ${incomeCategory}, Tutar: ${incomeAmount}`);
+    } else {
+      Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz.');
+    }
+  }
 /* eski hali
   const handleSaveExpense = () => {
     if (selectedExpenseCategory && expenseAmount) {
@@ -51,7 +61,7 @@ const ExpensesScreen: React.FC = () => {
 
       <Text style={styles.label}>Kategoriler:</Text>
       <TouchableOpacity onPress={() => setIncomePickerVisible(true)} style={styles.pickerButton}>
-        <Text style={styles.buttonText}>{selectedIncomeCategory || "Bir kategori seçiniz"}</Text>
+        <Text style={styles.buttonText}>{incomeCategory || "Bir kategori seçiniz"}</Text>
       </TouchableOpacity>
 
       <Modal visible={isIncomePickerVisible} transparent={true} animationType="fade">
@@ -62,7 +72,7 @@ const ExpensesScreen: React.FC = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => {
-                  setSelectedIncomeCategory(category);
+                  setIncomeCategory(category);
                   setIncomePickerVisible(false);
                 }}
               >
@@ -93,7 +103,7 @@ const ExpensesScreen: React.FC = () => {
         <Text style={styles.buttonText}>{expenseCategory || "Bir kategori seçiniz"}</Text>
       </TouchableOpacity>
 
-      <Modal visible={isExpensePickerVisible} transparent={true} animationType="slide">
+      <Modal visible={isExpensePickerVisible} transparent={true} animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Harcama Kategorisi Seçin</Text>
