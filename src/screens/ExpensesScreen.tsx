@@ -3,6 +3,10 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, Platform, ScrollView,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
+interface CategoryTotals {
+  [category: string]: number;
+}
+
 
 const ExpensesScreen: React.FC = () => {
   const [incomeCategory, setIncomeCategory] = useState('');
@@ -15,41 +19,51 @@ const ExpensesScreen: React.FC = () => {
   const incomeCategories = ["Maaş", "Kira", "Yatırım", "Diğer"];
   const expenseCategories = ["Market", "Ulaşım", "Alışveriş", "Kırtasiye / Okul", "Çevrimiçi Harcamalar", "Faturalar"];
 
-/*
-  const handleSaveIncome = () => {
-    if (selectedIncomeCategory && incomeAmount) {
-      
-      Alert.alert('Gelir Kaydedildi', `${selectedIncomeCategory}, Tutar: ${incomeAmount}`);
-    } else {
-      Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
-    }
-  };
-  */
   const handleSaveIncome = async () => {
     if (incomeCategory && incomeAmount) {
-      const incomeData = { incomeCategory, incomeAmount };
-      await AsyncStorage.setItem('incomeData', JSON.stringify(incomeData));
-      Alert.alert('Gelir kaydedildi', `Kategori: ${incomeCategory}, Tutar: ${incomeAmount}`);
+      try {
+        // Mevcut gelir verilerini al
+        const existingData = await AsyncStorage.getItem('incomeTotals');
+        let incomeTotals: CategoryTotals = existingData ? JSON.parse(existingData) : {};
+        
+        // Seçilen kategori için toplam tutarı güncelle
+        const currentAmount = Number(incomeTotals[incomeCategory]) || 0;
+        incomeTotals[incomeCategory] = currentAmount + Number(incomeAmount);
+        
+        // Güncellenmiş verileri kaydet
+        await AsyncStorage.setItem('incomeTotals', JSON.stringify(incomeTotals));
+        
+        Alert.alert('Gelir kaydedildi', `Kategori: ${incomeCategory}, Tutar: ${incomeAmount}`);
+        setIncomeAmount('');
+        setIncomeCategory('');
+      } catch (error) {
+        Alert.alert('Hata', 'Gelir kaydedilirken bir hata oluştu');
+      }
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz.');
     }
-  }
-/* eski hali
-  const handleSaveExpense = () => {
-    if (selectedExpenseCategory && expenseAmount) {
-      
-      Alert.alert('Harcama Kaydedildi', `${selectedExpenseCategory}, Tutar: ${expenseAmount}`);
-    } else {
-      Alert.alert('Hata', 'Lütfen bir kategori ve tutar giriniz');
-    }
   };
-  */
 
   const handleSaveExpense = async () => {
     if (expenseCategory && expenseAmount) {
-      const expenseData = { expenseCategory, expenseAmount };
-      await AsyncStorage.setItem('expenseData', JSON.stringify(expenseData));
-      Alert.alert('Harcama Kaydedildi', `Kategori: ${expenseCategory}, Tutar: ${expenseAmount}`);
+      try {
+        // Mevcut gider verilerini al
+        const existingData = await AsyncStorage.getItem('expenseTotals');
+        let expenseTotals: CategoryTotals = existingData ? JSON.parse(existingData) : {};
+        
+        // Seçilen kategori için toplam tutarı güncelle
+        const currentAmount = Number(expenseTotals[expenseCategory]) || 0;
+        expenseTotals[expenseCategory] = currentAmount + Number(expenseAmount);
+        
+        // Güncellenmiş verileri kaydet
+        await AsyncStorage.setItem('expenseTotals', JSON.stringify(expenseTotals));
+        
+        Alert.alert('Harcama Kaydedildi', `Kategori: ${expenseCategory}, Tutar: ${expenseAmount}`);
+        setExpenseAmount('');
+        setExpenseCategory('');
+      } catch (error) {
+        Alert.alert('Hata', 'Harcama kaydedilirken bir hata oluştu');
+      }
     } else {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
     }
@@ -145,7 +159,7 @@ const styles = StyleSheet.create({
   input: { padding: 5, height: 50, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 8, marginBottom: 16, borderRadius: 10 },
   customButton: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10, marginBottom: 30 },
   buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  pickerButton: { backgroundColor: '#ccc', padding: 15, borderRadius: 10, marginBottom: 16, alignItems: 'center' },
+  pickerButton: { backgroundColor: '#37cfed', padding: 15, borderRadius: 10, marginBottom: 16, alignItems: 'center' },
   modalContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
   modalContent: { backgroundColor: 'white', marginHorizontal: 20, padding: 20, borderRadius: 10 },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },

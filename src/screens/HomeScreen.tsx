@@ -27,6 +27,12 @@ interface InvestmentData {
   gold?: CurrencyData;
 }
 
+interface CategoryTotals {
+  [category: string]: number;
+}
+
+
+
 const GroupBox: React.FC<GroupBoxProps> = ({ title, children, style }) => {
   return (
     <View style={[styles.groupBox, style]}>
@@ -44,30 +50,30 @@ const GroupBox: React.FC<GroupBoxProps> = ({ title, children, style }) => {
 
 const HomeScreen: React.FC = () => {
   const [investmentData, setInvestmentData] = useState<InvestmentData | null>(null);
-  const [expenseData, setExpenseData] = useState<{ expenseCategory: string; expenseAmount: string } | null>(null);
-  const [incomeData, setIncomeData] = useState<{ incomeCategory: string; incomeAmount: string } | null>(null);
+  const [expenseTotals, setExpenseTotals] = useState<CategoryTotals>({});
+  const [incomeTotals, setIncomeTotals] = useState<CategoryTotals>({});
   const [refreshing, setRefreshing] = useState(false); //sayfa güncellemek için
 
   // Veriyi yükleyen fonksiyon
   const loadData = async () => {
     try {
       const invest = await AsyncStorage.getItem('investData');
-      const expense = await AsyncStorage.getItem('expenseData');
-      const income = await AsyncStorage.getItem('incomeData');
+      const expenseData = await AsyncStorage.getItem('expenseTotals');
+      const incomeData = await AsyncStorage.getItem('incomeTotals');
       
       if (invest) {
         const parsedInvest = JSON.parse(invest);
         setInvestmentData(parsedInvest);
       }
       
-      if (expense) {
-        const parsedExpense = JSON.parse(expense);
-        setExpenseData(parsedExpense);
+      if (expenseData) {
+        const parsedExpense = JSON.parse(expenseData);
+        setExpenseTotals(parsedExpense);
       }
 
-      if (income) {
-        const parsedIncome = JSON.parse(income);
-        setIncomeData(parsedIncome);
+      if (incomeData) {
+        const parsedIncome = JSON.parse(incomeData);
+        setIncomeTotals(parsedIncome);
       }
     } catch (error) {
       console.error('Veri yükleme hatası:', error);
@@ -84,6 +90,12 @@ const HomeScreen: React.FC = () => {
     await loadData(); // Veriyi yeniden yükle
     setRefreshing(false); // Yenilemeyi durdur
   };
+
+
+  // Toplam gelir ve gider hesaplama
+  const totalIncome = Object.values(incomeTotals).reduce((sum, amount) => sum + amount, 0);
+  const totalExpense = Object.values(expenseTotals).reduce((sum, amount) => sum + amount, 0);
+
 
   return (
     <ScrollView 
@@ -210,31 +222,43 @@ const HomeScreen: React.FC = () => {
       )}
       
       {/* Gider Bilgileri */}
-      {expenseData && (
-        <GroupBox title="Harcama Detayları">
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Kategori:</Text>
-            <Text style={styles.value}>{expenseData.expenseCategory}</Text>
+      {expenseTotals && (
+        <GroupBox title="Gelir Detayları">
+        <View style={styles.infoHeaderRow}>
+          <Text style={styles.headerLabel}>Kategori</Text>
+          <Text style={styles.headerValue}>Tutar</Text>
+        </View>
+        {Object.entries(incomeTotals).map(([category, amount]) => (
+          <View key={category} style={styles.infoRow}>
+            <Text style={styles.label}>{category}</Text>
+            <Text style={styles.value}>{amount.toFixed(2)} ₺</Text>
           </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Tutar:</Text>
-            <Text style={styles.value}>{expenseData.expenseAmount} ₺</Text>
-          </View>
-        </GroupBox>
+        ))}
+        <View style={[styles.infoRow, styles.totalRow]}>
+          <Text style={styles.totalLabel}>Toplam Gelir</Text>
+          <Text style={styles.totalValue}>{totalIncome.toFixed(2)} ₺</Text>
+        </View>
+      </GroupBox>
       )}
 
       {/* Gelir Bilgileri */}
-      {incomeData && (
-        <GroupBox title="Gelir Detayları">
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Kategori:</Text>
-            <Text style={styles.value}>{incomeData.incomeCategory}</Text>
+      {incomeTotals && (
+        <GroupBox title="Harcama Detayları">
+        <View style={styles.infoHeaderRow}>
+          <Text style={styles.headerLabel}>Kategori</Text>
+          <Text style={styles.headerValue}>Tutar</Text>
+        </View>
+        {Object.entries(expenseTotals).map(([category, amount]) => (
+          <View key={category} style={styles.infoRow}>
+            <Text style={styles.label}>{category}</Text>
+            <Text style={styles.value}>{amount.toFixed(2)} ₺</Text>
           </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Tutar:</Text>
-            <Text style={styles.value}>{incomeData.incomeAmount} ₺</Text>
-          </View>
-        </GroupBox>
+        ))}
+        <View style={[styles.infoRow, styles.totalRow]}>
+          <Text style={styles.totalLabel}>Toplam Gider</Text>
+          <Text style={styles.totalValue}>{totalExpense.toFixed(2)} ₺</Text>
+        </View>
+      </GroupBox>
       )}
     </ScrollView>
   );
@@ -280,6 +304,27 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 10,
   },
+
+//gelir gider detay
+  infoHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    marginBottom: 8,
+  },
+  headerLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#666666',
+  },
+  headerValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#666666',
+  },
+  
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -298,6 +343,28 @@ const styles = StyleSheet.create({
     color: '#333333',
     fontWeight: '600',
   },
+
+  totalRow: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 2,
+    borderTopColor: '#E0E0E0',
+  },
+  totalLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333333',
+  },
+  totalValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333333',
+  },
+
+
+
+
+  //gelir gider detay
   currencyHeader: {
     paddingTop: 15,
     marginBottom: 10,

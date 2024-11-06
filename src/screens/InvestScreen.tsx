@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-const IncomeScreen: React.FC = () => {
+const InvestScreen: React.FC = () => {
   // Durumlar (state)
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const [dollarRate, setDollarRate] = useState('');
@@ -353,4 +353,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IncomeScreen;
+export default InvestScreen;

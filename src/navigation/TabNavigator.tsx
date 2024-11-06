@@ -4,12 +4,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Image } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import ExpensesScreen from '../screens/ExpensesScreen';
-import IncomeScreen from '../screens/IncomeScreen';
+import InvestScreen from '../screens/InvestScreen';
 
 type TabParamList = {
   Home: undefined;
   Expenses: undefined;
-  Income: undefined;
+  Invest: undefined;
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -45,10 +45,10 @@ const TabNavigator: React.FC = () => {
           }} 
         />
         <Tab.Screen 
-          name="Income" 
-          component={IncomeScreen} 
+          name="Invest" 
+          component={InvestScreen} 
           options={{ 
-            tabBarLabel: 'Income',
+            tabBarLabel: 'Invest',
             tabBarIcon: ({ color, size }) => (
               <Image 
                 source={require('../assets/icons/savings.png')}
