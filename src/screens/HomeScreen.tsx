@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ViewStyle, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle, ScrollView,RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface GroupBoxProps {
@@ -46,38 +46,52 @@ const HomeScreen: React.FC = () => {
   const [investmentData, setInvestmentData] = useState<InvestmentData | null>(null);
   const [expenseData, setExpenseData] = useState<{ expenseCategory: string; expenseAmount: string } | null>(null);
   const [incomeData, setIncomeData] = useState<{ incomeCategory: string; incomeAmount: string } | null>(null);
+  const [refreshing, setRefreshing] = useState(false); //sayfa güncellemek için
+
+  // Veriyi yükleyen fonksiyon
+  const loadData = async () => {
+    try {
+      const invest = await AsyncStorage.getItem('investData');
+      const expense = await AsyncStorage.getItem('expenseData');
+      const income = await AsyncStorage.getItem('incomeData');
+      
+      if (invest) {
+        const parsedInvest = JSON.parse(invest);
+        setInvestmentData(parsedInvest);
+      }
+      
+      if (expense) {
+        const parsedExpense = JSON.parse(expense);
+        setExpenseData(parsedExpense);
+      }
+
+      if (income) {
+        const parsedIncome = JSON.parse(income);
+        setIncomeData(parsedIncome);
+      }
+    } catch (error) {
+      console.error('Veri yükleme hatası:', error);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const invest = await AsyncStorage.getItem('investData');
-        const expense = await AsyncStorage.getItem('expenseData');
-        const income = await AsyncStorage.getItem('incomeData')
-        
-        if (invest) {
-          const parsedInvest = JSON.parse(invest);
-          setInvestmentData(parsedInvest);
-        }
-        
-        if (expense) {
-          const parsedExpense = JSON.parse(expense);
-          setExpenseData(parsedExpense);
-        }
-
-        if (income) {
-          const parsedIncome = JSON.parse(income);
-          setIncomeData(parsedIncome);
-        }
-      } catch (error) {
-        console.error('Veri yükleme hatası:', error);
-      }
-    };
-
     loadData();
   }, []);
 
+  // Sayfayı aşağı çekip güncelleme fonksiyonu
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadData(); // Veriyi yeniden yükle
+    setRefreshing(false); // Yenilemeyi durdur
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <Text style={styles.mainTitle}>Özet</Text>
       
       {/* Yatırım Bilgileri */}
@@ -91,7 +105,7 @@ const HomeScreen: React.FC = () => {
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.label}>Toplam Miktar:</Text>
-                <Text style={styles.value}>{investmentData.dollar.totalAmount.toFixed(2)} €</Text>
+                <Text style={styles.value}>{investmentData.dollar.totalAmount.toFixed(2)} $</Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.label}>Ortalama Maliyet:</Text>
@@ -164,7 +178,7 @@ const HomeScreen: React.FC = () => {
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.label}>Toplam Miktar:</Text>
-                <Text style={styles.value}>{investmentData.gold.totalAmount.toFixed(2)} €</Text>
+                <Text style={styles.value}>{investmentData.gold.totalAmount.toFixed(2)} GR.</Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.label}>Ortalama Maliyet:</Text>
@@ -185,7 +199,7 @@ const HomeScreen: React.FC = () => {
                     <Text style={styles.transactionDate}>
                       {new Date(transaction.date).toLocaleDateString('tr-TR')}
                     </Text>
-                    <Text style={styles.transactionAmount}>{transaction.amount} €</Text>
+                    <Text style={styles.transactionAmount}>{transaction.amount} GR.</Text>
                     <Text style={styles.transactionRate}>{transaction.rate} ₺</Text>
                   </View>
                 ))}
