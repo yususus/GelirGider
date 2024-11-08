@@ -265,149 +265,35 @@ const HomeScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-  },
-  mainTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
-  },
-  groupBox: {
-    marginVertical: 10,
-    marginHorizontal: 0,
-    marginBottom: 30,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
-  },
-  titleContainer: {
-    position: 'absolute',
-    top: -10,
-    left: 10,
-    zIndex: 1,
-  },
-  titleBackground: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 8,
-  },
-  groupBoxTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666666',
-  },
-  content: {
-    padding: 16,
-    marginTop: 10,
-  },
+  container: {flex: 1, padding: 16, backgroundColor: '#f5f5f5', },
+  mainTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#333',},
+  groupBox: { marginVertical: 10, marginHorizontal: 0, marginBottom: 30, borderRadius: 8, borderWidth: 1, borderColor: '#E0E0E0', backgroundColor: '#FFFFFF', },
+  titleContainer: {  position: 'absolute',  top: -10,  left: 10,  zIndex: 1,},
+  titleBackground: {  backgroundColor: '#FFFFFF',  paddingHorizontal: 8,},
+  groupBoxTitle: {  fontSize: 16,  fontWeight: '600',  color: '#666666',},
+  content: {  padding: 16,  marginTop: 10,},
 
 //gelir gider detay
-  infoHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    marginBottom: 8,
-  },
-  headerLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#666666',
-  },
-  headerValue: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#666666',
-  },
+  infoHeaderRow: {  flexDirection: 'row',  justifyContent: 'space-between',  paddingVertical: 4,  borderBottomWidth: 1,  borderBottomColor: '#E0E0E0',  marginBottom: 8,},
+  headerLabel: {  fontSize: 14,  fontWeight: 'bold',  color: '#666666',},
+  headerValue: {  fontSize: 14,  fontWeight: 'bold',  color: '#666666',},
   
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  label: {
-    fontSize: 14,
-    color: '#666666',
-    fontWeight: '500',
-  },
-  value: {
-    fontSize: 14,
-    color: '#333333',
-    fontWeight: '600',
-  },
-
-  totalRow: {
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 2,
-    borderTopColor: '#E0E0E0',
-  },
-  totalLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333333',
-  },
-  totalValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333333',
-  },
-
-
-
+  infoRow: {  flexDirection: 'row',  justifyContent: 'space-between',  alignItems: 'center',  paddingVertical: 8,  borderBottomWidth: 1,  borderBottomColor: '#f0f0f0',},
+  label: {  fontSize: 14,  color: '#666666',  fontWeight: '500',},
+  value: {  fontSize: 14,  color: '#333333',  fontWeight: '600',},
+  totalRow: {  marginTop: 8,  paddingTop: 8,  borderTopWidth: 2,  borderTopColor: '#E0E0E0',},
+  totalLabel: {  fontSize: 16,  fontWeight: 'bold',  color: '#333333',},
+  totalValue: {  fontSize: 16,  fontWeight: 'bold',  color: '#333333',},
 
   //gelir gider detay
-  currencyHeader: {
-    paddingTop: 15,
-    marginBottom: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: '#E0E0E0',
-    paddingBottom: 5,
-  },
-  currencyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  transactionsContainer: {
-    marginTop: 15,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#666',
-    marginBottom: 8,
-  },
-  transactionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-  },
-  transactionDate: {
-    fontSize: 12,
-    color: '#666',
-  },
-  transactionAmount: {
-    fontSize: 12,
-    color: '#333',
-    fontWeight: '500',
-  },
-  transactionRate: {
-    fontSize: 12,
-    color: '#333',
-    fontWeight: '500',
-  },
+  currencyHeader: {  paddingTop: 15,  marginBottom: 10,  borderBottomWidth: 2,  borderBottomColor: '#E0E0E0',  paddingBottom: 5,},
+  currencyTitle: {  fontSize: 18,  fontWeight: '600',  color: '#333',},
+  transactionsContainer: {  marginTop: 15,  paddingTop: 10,  borderTopWidth: 1,  borderTopColor: '#E0E0E0',},
+  sectionTitle: {  fontSize: 16,  fontWeight: '500',  color: '#666',  marginBottom: 8,},
+  transactionRow: {  flexDirection: 'row',  justifyContent: 'space-between',  paddingVertical: 4,},
+  transactionDate: {  fontSize: 12,  color: '#666',},
+  transactionAmount: {  fontSize: 12,  color: '#333',  fontWeight: '500',},
+  transactionRate: {  fontSize: 12,  color: '#333',  fontWeight: '500',},
 });
 
 export default HomeScreen;

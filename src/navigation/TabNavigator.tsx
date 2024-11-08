@@ -3,8 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { Image } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
-import ExpensesScreen from '../screens/ExpensesScreen';
-import InvestScreen from '../screens/InvestScreen';
+import ExpensesScreen from '../screens/Expense/ExpensesScreen';
+import InvestScreen from '../screens/Investment/InvestScreen';
 
 type TabParamList = {
   Home: undefined;
