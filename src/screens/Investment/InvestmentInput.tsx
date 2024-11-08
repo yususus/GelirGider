@@ -2,21 +2,21 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 interface InvestmentInputProps {
-  rate: string;
-  setRate: (value: string) => void;
-  amount: string;
-  setAmount: (value: string) => void;
-  onSave: () => void;
   label: string;
+  rate: string;
+  setRate: (rate: string) => void;
+  amount: string;
+  setAmount: (amount: string) => void;
+  onSave: () => void;
+  transactionType: 'buy' | 'sell';
 }
-
 const InvestmentInput: React.FC<InvestmentInputProps> = ({ rate, setRate, amount, setAmount, onSave, label }) => (
   <View style={styles.inputContainer}>
-    <Text style={styles.inputLabel}>{label} Alış Kuru:</Text>
+    <Text style={styles.inputLabel}>{label} Kuru:</Text>
     <TextInput
       style={styles.input}
       keyboardType="numeric"
-      placeholder="Alış kuru giriniz"
+      placeholder="Kuru giriniz"
       value={rate}
       onChangeText={setRate}
     />
