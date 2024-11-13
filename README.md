@@ -1,79 +1,139 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Gelir Gider Takip (ReactNative)
 
-# Getting Started
+<div align="center">
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+<img src="https://github.com/user-attachments/assets/3b79e2dd-a88b-4bbf-83d3-38841316d8ca" alt="logo" title="İcon" width="100"/>
+<div>
+  <a href="https://apps.apple.com/tr/app/learn-english-words-sentences/id6737259105?l=tr" style="display: inline-block; overflow: hidden; border-radius: 13px; width: 250px; height: 83px;">
 
-## Step 1: Start the Metro Server
+</a>
+</div>
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+React Native ile geliştirilmiş, modern ve etkileşimli bir gelir gider takip uygulaması.
 
-To start Metro, run the following command from the _root_ of your React Native project:
 
+
+</div>
+
+## ✨ Özellikler
+
+- 🎯 React Native ile modern ve akıcı kullanıcı arayüzü
+- 💾 AsyncStorage ile veri kaydı
+- 🔄 TabNavigator ile sayfalar arası kolay geçiş
+- 🎨 iOS 13+ ve Android için optimize edilmiş tasarım
+
+
+## 📱 Ekran Görüntüleri
+
+<div align="center">
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/d9dff090-104b-4ae0-9820-eacdcc573a1e" alt="Ana Sayfa" title="Ana Sayfa"/></td>
+    <td><img src="https://github.com/user-attachments/assets/a2548531-4db2-43ec-bc78-5c444e8bb3b8" alt="Soru Ekranı" title="Soru Ekranı"/></td>
+    <td><img src="https://github.com/user-attachments/assets/b0df484d-010b-4d40-afc5-11ec53d946c5" alt="İlerleme" title="İlerleme"/></td>
+  </tr>
+</table>
+</div>
+
+## 🛠 Gereksinimler
+
+- iOS 13.0+
+- Android
+- Node 18+
+- ReactNative 0.75+
+
+### Manuel Kurulum
+
+1. Projeyi klonlayın:
 ```bash
-# using npm
-npm start
+git clone https://github.com/yususus/GelirGider.git
+```
+2. Gerekli bağımlılıkların yüklendiğinden emin olun
+3. Projeyi derleyin ve çalıştırın
 
-# OR using Yarn
-yarn start
+
+### Veri Kaydetme
+```swift
+ const saveTransaction = async (currency: 'dollar' | 'euro' | 'gold', rate: string, amount: string) => {
+    if (rate && amount) {
+      try {
+        const currentData = await AsyncStorage.getItem('investData');
+        const parsedData: InvestmentData = currentData ? JSON.parse(currentData) : {};
+        
+        const currentCurrencyData = parsedData[currency] || { transactions: [], totalAmount: 0, averageRate: 0 };
+        const transactionAmount = parseFloat(amount);
+        
+        // Satış işlemi için miktar kontrolü
+        if (transactionType === 'sell') {
+          const currentTotal = calculateTotalAmount(currentCurrencyData.transactions);
+          if (transactionAmount > currentTotal) {
+            Alert.alert('Hata', `Yetersiz ${currency} bakiyesi. Mevcut: ${currentTotal.toFixed(2)}`);
+            return;
+          }
+        }
+
+        const newTransaction: Transaction = {
+          type: transactionType,
+          rate: parseFloat(rate),
+          amount: transactionAmount,
+          date: new Date().toISOString(),
+        };
+
+        const updatedTransactions = [...currentCurrencyData.transactions, newTransaction];
+        const totalAmount = calculateTotalAmount(updatedTransactions);
+
+        // Ortalama maliyet hesaplama (sadece alış işlemleri için)
+        const buyTransactions = updatedTransactions.filter(t => t.type === 'buy');
+        const totalBuyAmount = buyTransactions.reduce((sum, t) => sum + t.amount, 0);
+        const weightedSum = buyTransactions.reduce((sum, t) => sum + t.rate * t.amount, 0);
+        const averageRate = totalBuyAmount > 0 ? weightedSum / totalBuyAmount : 0;
+
+        const updatedCurrencyData: CurrencyData = {
+          transactions: updatedTransactions,
+          totalAmount,
+          averageRate
+        };
+
+        const newData: InvestmentData = { ...parsedData, [currency]: updatedCurrencyData };
+
+        await AsyncStorage.setItem('investData', JSON.stringify(newData));
+        
+        const actionType = transactionType === 'buy' ? 'Alış' : 'Satış';
+        Alert.alert(`${currency} ${actionType} İşlemi Kaydedildi`,
+          `İşlem Tipi: ${actionType}\n` +
+          `İşlem Kuru: ${rate}\n` +
+          `İşlem Miktarı: ${amount}\n` +
+          `Toplam Miktar: ${totalAmount.toFixed(2)}\n` +
+          `Ortalama Maliyet: ${averageRate.toFixed(2)}`
+        );
+
+        // İşlem sonrası input alanlarını temizle
+        switch(currency) {
+          case 'dollar':
+            setDollarRate('');
+            setDollarAmount('');
+            break;
+          case 'euro':
+            setEuroRate('');
+            setEuroAmount('');
+            break;
+          case 'gold':
+            setGoldRate('');
+            setGoldAmount('');
+            break;
+        }
+        
+      } catch (error) {
+        console.error('Kayıt hatası:', error);
+        Alert.alert('Hata', 'Veriler kaydedilirken bir hata oluştu');
+      }
+    } else {
+      Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
+    }
+  };
 ```
 
-## Step 2: Start your Application
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+<div align="center">
+⭐️ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
+</div>
